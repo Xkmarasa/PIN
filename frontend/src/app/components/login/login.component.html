@@ -1,37 +1,176 @@
-<div class="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50">
-  <div class="w-full max-w-md p-8">
-    <div class="text-center mb-8">
-      <h1 class="text-4xl font-bold mb-2 text-gray-800">Record</h1>
-      <p class="text-gray-600">Descubre y comparte música</p>
+<div
+  style="min-height:100vh; background:#FBFBFD; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:#0f172a; padding:40px 20px;"
+>
+  <div style="width:100%; max-width:600px; display:flex; flex-direction:column; align-items:center; gap:32px;">
+    <!-- Logo/Título -->
+    <div style="text-align:center; display:flex; flex-direction:column; gap:12px;">
+      <h1 style="margin:0; font-size:3.5rem; font-weight:700; letter-spacing:-0.02em; color:#071431; background:linear-gradient(90deg,#1db954,#7c3aed); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">
+        Record
+      </h1>
+      <p style="margin:0; font-size:1.2rem; color:#64748b; font-weight:500;">Descubre y comparte música</p>
     </div>
 
-    <div class="bg-white rounded-lg shadow-lg p-6">
-      <div class="text-center mb-6">
-        <span class="text-lg text-gray-700">Inicia sesión con Spotify</span>
+    <!-- Card de Login -->
+    <div style="width:100%; background:white; border-radius:20px; box-shadow: 0 12px 40px rgba(2,6,23,0.08); padding:48px 40px; display:flex; flex-direction:column; gap:24px;">
+      <!-- Mensaje de error -->
+      @if (errorMessage) {
+        <div style="padding:12px 16px; background:#fff5f5; border:1px solid #fecaca; color:#991b1b; border-radius:12px; font-size:0.9rem;">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <!-- Título del card -->
+      <div style="text-align:center;">
+        <h2 style="margin:0; font-size:1.5rem; font-weight:700; color:#071431;">Inicia sesión</h2>
+        <p style="margin:8px 0 0 0; font-size:0.95rem; color:#64748b;">Ingresa tus credenciales para comenzar</p>
       </div>
 
-      <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
-        {{ errorMessage }}
-      </div>
+      <!-- Formulario de login -->
+      <form (ngSubmit)="onLoginSubmit()" style="display:flex; flex-direction:column; gap:20px;">
+        <!-- Campo Email -->
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <label style="font-size:0.9rem; font-weight:600; color:#071431;">Correo electrónico</label>
+          <input
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            required
+            placeholder="tu@email.com"
+            [disabled]="isProcessing"
+            style="
+              width:100%;
+              padding:14px 16px;
+              border:1px solid rgba(15,23,42,0.1);
+              border-radius:12px;
+              font-size:1rem;
+              color:#071431;
+              background:white;
+              transition: border-color 160ms ease;
+              box-sizing:border-box;
+            "
+            (focus)="onInputFocus($event)"
+            (blur)="onInputBlur($event)"
+          />
+        </div>
 
-      <div class="flex justify-center">
+        <!-- Campo Contraseña -->
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <label style="font-size:0.9rem; font-weight:600; color:#071431;">Contraseña</label>
+          <input
+            type="password"
+            [(ngModel)]="password"
+            name="password"
+            required
+            placeholder="••••••••"
+            [disabled]="isProcessing"
+            style="
+              width:100%;
+              padding:14px 16px;
+              border:1px solid rgba(15,23,42,0.1);
+              border-radius:12px;
+              font-size:1rem;
+              color:#071431;
+              background:white;
+              transition: border-color 160ms ease;
+              box-sizing:border-box;
+            "
+            (focus)="onInputFocus($event)"
+            (blur)="onInputBlur($event)"
+          />
+        </div>
+
+        <!-- Botón de login -->
         <button 
-          [disabled]="isProcessing"
-          [class.opacity-50]="isProcessing"
-          [class.cursor-not-allowed]="isProcessing"
-          class="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full cursor-pointer select-none transition-colors duration-200 flex items-center gap-2"
-          (click)="onLoginClicked()">
-          <span *ngIf="!isProcessing">Continuar con Spotify</span>
-          <span *ngIf="isProcessing" class="flex items-center gap-2">
-            <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-            Conectando...
-          </span>
+          type="submit"
+          [disabled]="isProcessing || !email || !password"
+          [style.opacity]="(isProcessing || !email || !password) ? '0.7' : '1'"
+          [style.cursor]="(isProcessing || !email || !password) ? 'not-allowed' : 'pointer'"
+          style="
+            width:100%;
+            padding:16px 24px;
+            background:linear-gradient(90deg,#1db954,#7c3aed);
+            color:white;
+            border:none;
+            border-radius:14px;
+            font-weight:600;
+            font-size:1.1rem;
+            box-shadow: 0 8px 28px rgba(29,185,84,0.12);
+            transition: transform 160ms ease, box-shadow 160ms ease;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:12px;
+            margin-top:8px;
+          "
+          (mousedown)="onButtonMouseDown($event)"
+          (mouseup)="onButtonMouseUp($event)"
+        >
+          @if (!isProcessing) {
+            <span>Iniciar sesión</span>
+          } @else {
+            <span style="display:flex; align-items:center; gap:12px;">
+              <span style="display:inline-block; width:20px; height:20px; border:3px solid white; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;"></span>
+              Iniciando sesión...
+            </span>
+          }
         </button>
+      </form>
+
+      <!-- Separador -->
+      <div style="display:flex; align-items:center; gap:16px; margin:8px 0;">
+        <div style="flex:1; height:1px; background:rgba(15,23,42,0.1);"></div>
+        <span style="font-size:0.85rem; color:#94a3b8;">o</span>
+        <div style="flex:1; height:1px; background:rgba(15,23,42,0.1);"></div>
       </div>
 
-      <div class="mt-6 text-center text-sm text-gray-500">
-        <p>Al continuar, aceptas compartir tu información de Spotify</p>
+      <!-- Botón de Spotify -->
+      <button 
+        [disabled]="isProcessing"
+        (click)="onSpotifyLogin()"
+        [style.opacity]="isProcessing ? '0.7' : '1'"
+        [style.cursor]="isProcessing ? 'not-allowed' : 'pointer'"
+        style="
+          width:100%;
+          padding:16px 24px;
+          background:white;
+          color:#071431;
+          border:1px solid rgba(15,23,42,0.1);
+          border-radius:14px;
+          font-weight:600;
+          font-size:1.1rem;
+          transition: transform 160ms ease, box-shadow 160ms ease;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:12px;
+        "
+        (mousedown)="onButtonMouseDown($event)"
+        (mouseup)="onButtonMouseUp($event)"
+      >
+        <span>Continuar con Spotify</span>
+      </button>
+
+      <!-- Información adicional -->
+      <div style="text-align:center; padding-top:8px;">
+        <p style="margin:0; font-size:0.85rem; color:#94a3b8; line-height:1.5;">
+          Al continuar, aceptas compartir tu información de Spotify con Record
+        </p>
       </div>
+    </div>
+
+    <!-- Footer adicional -->
+    <div style="text-align:center;">
+      <p style="margin:0; font-size:0.9rem; color:#94a3b8;">
+        ¿Primera vez? Crea una cuenta gratuita
+      </p>
     </div>
   </div>
+
+  <!-- Estilos para animación de spinner -->
+  <style>
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </div>
